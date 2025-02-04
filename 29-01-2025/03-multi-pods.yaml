@@ -1,0 +1,12 @@
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: nginx-tomcat-2pods
+  namespace: sidhu-namespaces
+spec:
+  containers:
+   - name: nginx-con1
+     image: nginx
+
+   - name: tomcat-con2
+     image: tomcat

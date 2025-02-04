@@ -1,0 +1,13 @@
+apiVersion: eksctl.io/v1alpha5  # api of k8s relestion version for code build
+kind: ClusterConfig
+
+metadata:
+  name: sidhu-eksctl  # name spicing for cluster here for other can also spicify for name here
+  region: us-east-1  # which region to create 
+
+managedNodeGroups: # here nodes managed by AWS, if we use 'nodeGroups' we need to take care of it
+  - name: spot   # name of the insatne create here 
+    instanceType: t3a.medium  # confiagrtion of the instances 
+    desiredCapacity: 2  # capcity of or reques no instances to create
+    volumeSize: 20   # storeage volume for creating the instances 
+#   spot: true # not for production which type if it spot need to mention here if it is  not spot u can leve empty

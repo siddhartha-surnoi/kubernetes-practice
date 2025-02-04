@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-ip-svc
+  namespace: sidhu-namespaces
+  labels: 
+    project: service-sidhu
+    module: be
+    environment: dev
+spec:
+  containers:
+  - name: app-nginx-nodeport
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+    - name: http
+      containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sidhu-nodeport
+  namespace: sidhu-namespaces
+spec:
+  type: LoadBalancer
+  selector:
+    project: service-sidhu
+    module: be
+    environment: dev
+  ports:
+  - name: nginx-service-nodeport
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30013

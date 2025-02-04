@@ -1,0 +1,14 @@
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: labels-demo
+  namespace: sidhu-namespaces
+  labels: 
+   project: label-k8s
+   module: FE
+   environment: dev
+spec:
+  containers:
+   - name: nginx-con1
+     image: nginx
+  
