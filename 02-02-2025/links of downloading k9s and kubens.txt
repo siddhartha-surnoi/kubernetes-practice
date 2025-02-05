@@ -1,0 +1,25 @@
+installation of k9s:  https://webinstall.dev/k9s/
+
+install commands:
+curl -sS https://webi.sh/k9s | sh; \
+source ~/.config/envman/PATH.env
+export TERM=xterm-256color
+
+reference commands: https://faun.pub/hassle-free-management-of-your-kubernetes-cluster-in-style-using-k9s-28bdac4142b4
+
+--> https://k9scli.io/topics/commands/
+
+
+k9s ---> run k9s
+k9s --> shit+: pods --check pods
+
+installation of kubens: 
+
+https://github.com/ahmetb/kubectx
+
+--> sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+
+--> sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+
+reference commands: https://medium.com/@vinoji2005/simplify-your-kubernetes-operations-with-kubectx-and-kubens-b28772c941be
+
