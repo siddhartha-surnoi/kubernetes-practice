@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shipping
+  namespace: robo
+data:
+  CART_ENDPOINT: "cart:8080"
+  DB_HOST: "mysql"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping
+  namespace: robo
+  labels:
+    name: shipping
+    project: robo
+    tier: app 
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # deployment-set labels
+      name: shipping
+      project: robo
+      tier: app
+  template: # pod defination
+    metadata:
+      labels: # pod labels
+        name: shipping
+        project: robo
+        tier: app
+    spec:
+      containers:
+      - name: shipping
+        image: iamroyalreddy/shipping:v1
+        resources:
+         requests:
+          memory: "64Mi"
+          cpu: "250m"
+         limits:
+          memory: "128Mi"
+          cpu: "500m"
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: shipping
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping
+  namespace: robo
+spec:
+  selector:
+    name: shipping
+    project: robo
+    tier: app 
+  ports:
+  - protocol: TCP
+    port: 8080 #service-port
+    targetPort: 8080 #container-port

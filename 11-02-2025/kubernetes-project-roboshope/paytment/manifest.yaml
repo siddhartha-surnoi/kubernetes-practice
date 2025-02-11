@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment
+  namespace: robo
+type: Opaque
+data:
+  AMQP_USER: cm9ib3Nob3A=
+  AMQP_PASS: cm9ib3Nob3AxMjM=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  namespace: robo
+  labels: # these labels are deployment labels
+    app: payment
+    project: robo
+    tier: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # these labels are used to find the pods
+      app: payment
+      project: robo
+      tier: app
+  template:
+    metadata:
+      labels: # these labels are pod labels
+        app: payment
+        project: robo
+        tier: app
+    spec:
+      containers:
+      - name: payment
+        image: joindevops/payment:v1
+        resources:
+         requests:
+          memory: "64Mi"
+          cpu: "250m"
+         limits:
+          memory: "128Mi"
+          cpu: "500m"
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: payment
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: robo
+spec:
+  selector:
+    app: payment
+    project: robo
+    tier: app
+  ports:
+  - protocol: TCP
+    port: 8080 #service-port
+    targetPort: 8080 #container-port
