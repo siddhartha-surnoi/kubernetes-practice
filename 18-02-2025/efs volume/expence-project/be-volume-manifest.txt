@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: expense
+  labels:
+    app: BE
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: BE
+  template:
+    metadata:
+      labels:
+        app: BE
+    spec:
+      containers:
+      - name: backend
+        image: joindevops/backend:v1
+        resources:
+         requests:
+          memory: "800Mi"
+          cpu: "250m"
+         limits:
+          memory: "1200Mi"
+          cpu: "500m"
+        envFrom:
+        - configMapRef:
+            name: myconfigmap
+        ports:
+        - containerPort: 8080
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: expense
+spec:
+  selector:
+   app: BE
+  ports:
+    - name: backend-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myconfigmap
+  namespace: expense
+data:
+  DB_Host: mysql

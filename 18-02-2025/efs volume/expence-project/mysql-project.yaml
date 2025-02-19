@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    project: expense
+    environment: dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      project: expense
+      environment: dev
+  template:
+    metadata:
+      labels:
+        project: expense
+        environment: dev
+    spec:
+      containers:
+      - name: mysql
+        image: joindevops/mysql:v1
+        resources:
+         requests:
+          memory: "800Mi"
+          cpu: "250m"
+         limits:
+          memory: "1200Mi"
+          cpu: "500m"
+        ports:
+        - containerPort: 3306
+        volumeMounts: # docker run -v hostpath:contaierpath
+        - name: sidhu-efs
+        mountPath: /usr/share/nginx/html
+      volumes:
+      - name: sidhu-efs
+      persistentVolumeClaim:
+      claimName: sidhu-efs
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+spec:
+  selector:
+     project: expense
+     environment: dev
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306 # service port
+    targetPort: 3306 # container port
+    
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: efs-static
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-0e124d21f2d6a2f93
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: efs-static
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 5Gi

@@ -1,0 +1,72 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql-headless
+  namespace: expense
+spec:
+  clusterIP: None
+  selector:
+    project: expense
+    environment: dev
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: expense
+spec:
+  selector:
+    project: expense
+    environment: dev
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: expense
+spec:
+  selector:
+    matchLabels:
+      project: expense
+      environment: dev # Matches .spec.template.metadata.labels
+  serviceName: "mysql-headless"
+  replicas: 3
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        project: expense
+        environment: dev
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql
+        image: joindevops/mysql:v1
+        ports:
+        - containerPort: 3306 # Updated to match MySQL's default port
+          name: mysql-port
+        volumeMounts:
+        - name: mysql-ebs
+          mountPath: /var/lib/mysql # MySQL data directory
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-ebs
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: "mysql-ebs"
+      resources:
+        requests:
+          storage: 1Gi

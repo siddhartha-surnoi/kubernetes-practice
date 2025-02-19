@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: robo
+  labels:
+    name: redis
+    project: robo
+    tier: db 
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # should match with pod
+      name: redis
+      project: robo
+      tier: db
+  template: # pod defination
+    metadata:
+      labels: # pod labels
+        name: redis
+        project: robo
+        tier: db
+    spec:
+      containers:
+      - name: redis
+        image: redis
+        resources:
+         requests:
+          memory: "64Mi"
+          cpu: "250m"
+         limits:
+          memory: "128Mi"
+          cpu: "500m"
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: robo
+spec:
+  selector:
+    name: redis
+    project: robo
+    tier: db 
+  ports:
+  - protocol: TCP
+    port: 6379 #service-port
+    targetPort: 6379 #container-port
